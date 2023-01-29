@@ -21,12 +21,18 @@ class shiveReceiverService extends EventEmitter {
             const rabbitConn = await amqplib.connect(options.uri);
             let channel = await rabbitConn.createChannel();
 
-            await channel.assertQueue(`wait-${options.serviceName}`,{
-                durable: false
-            });
+            if (options.durable !== undefined) {
+                await channel.assertQueue(`wait-${options.serviceName}`, {
+                    durable: options.durable
+                });
+            } else {
+                await channel.assertQueue(`wait-${options.serviceName}`);
+            }
 
-            channel.prefetch(1);
-            
+            if (options.prefetch !== undefined) {
+                channel.prefetch(options.prefetch);
+            }
+
             this.emit('connect', "connected");
             channel.consume(`wait-${options.serviceName}`, async (data) => {
 
@@ -47,12 +53,22 @@ class shiveReceiverService extends EventEmitter {
             const rabbitConn = await amqplib.connect(options.uri);
             let channel = await rabbitConn.createChannel();
 
-            await channel.assertQueue(options.serviceName);
-            
+            if (options.durable !== undefined) {
+                await channel.assertQueue(options.serviceName, {
+                    durable: options.durable
+                });
+            } else {
+                await channel.assertQueue(options.serviceName);
+            }
+
+            if (options.prefetch !== undefined) {
+                channel.prefetch(options.prefetch);
+            }
+
             this.emit('connect', "connected");
             channel.consume(options.serviceName, async (data) => {
-                this.emit('start', data.content.toString(), function (queueData=data) { 
-                    channel.ack(queueData);
+                this.emit('start', data.content.toString(), function (queueData = data) {
+                    channel.ack(data);
                 });
             });
         } catch (error) { 
@@ -75,10 +91,21 @@ class shiveSenderService {
         })
     }
 
-    sendToQueue(channel, message, option = {wait: false}) {
+    assertQueue(channel, options) {
         return new Promise(async (resolve, reject) => {
             try {
-                if (option.wait && option.wait == true) {
+                await this.channel.assertQueue(channel, options);
+                resolve(this);
+            } catch (error) {
+                reject(error);
+            }
+        })
+    }
+
+    sendToQueue(channel, message, option) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (option && option.wait && option.wait == true) {
                     let waitQueue = await this.channel.assertQueue('', {
                         durable: false
                     });
@@ -91,13 +118,25 @@ class shiveSenderService {
                     }, {
                         noAck: true
                     });
-                    
-                    this.channel.sendToQueue(`wait-${channel}`, Buffer.from(message.toString()), {
+
+                    const sendToQueueOption = {
                         correlationId: correlationId,
                         replyTo: waitQueue.queue
-                    });
+                    };
+
+                    if (option.persistent !== undefined) {
+                        sendToQueueOption.persistent = option.persistent;
+                    }
+
+                    this.channel.sendToQueue(`wait-${channel}`, Buffer.from(message.toString()), sendToQueueOption);
                 } else {
-                    this.channel.sendToQueue(channel, Buffer.from(message.toString()));
+                    if (option && option.persistent !== undefined) {
+                        this.channel.sendToQueue(channel, Buffer.from(message.toString()), {
+                            persistent: option.persistent
+                        });
+                    } else {
+                        this.channel.sendToQueue(channel, Buffer.from(message.toString()));
+                    }
                     resolve('sent');
                 }
             } catch (error) {
