@@ -15,5 +15,12 @@
   },
   "bugs": {
       "url": "https://github.com/tholiya/micro-setu/issues"
-  }
+  },
+  "keywords": [
+    "micro-setu",
+    "microservice",
+    "rabbitmq",
+    "amqplib",
+    "queue-service"
+  ]
 }
