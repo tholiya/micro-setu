@@ -9,9 +9,9 @@
 
 ## Client
 
-    let { shiveSenderService } = require('micro-setu');
+    let { setuSenderService } = require('micro-setu');
     (async () => {   
-	    let  sender = new  shiveSenderService();
+	    let  sender = new  setuSenderService();
 	    let  connection = await  sender.connect({
 		    uri:  "<rabbitMQ-connection-uri>"
 	    });
@@ -41,9 +41,9 @@
 
 ## Service
 
-    let { shiveReceiverService } = require('micro-setu');
+    let { setuReceiverService } = require('micro-setu');
     
-    let receiver = new shiveReceiverService({
+    let receiver = new setuReceiverService({
         uri: "<rabbitMQ-connection-uri>",
         serviceName: 'my-queue-service',
 	durable: <boolean>,

@@ -3,7 +3,7 @@ const amqplib = require('amqplib');
 const uuid = require('uuid');
 
 
-class shiveReceiverService extends EventEmitter {
+class setuReceiverService extends EventEmitter {
     constructor(options) {
         super();
         //check for release mode
@@ -77,7 +77,7 @@ class shiveReceiverService extends EventEmitter {
     }
 }
 
-class shiveSenderService {
+class setueSenderService {
 
     connect(options) {
         return new Promise(async (resolve, reject) => { 
@@ -145,5 +145,5 @@ class shiveSenderService {
         })
     }
 }
-module.exports.shiveReceiverService = shiveReceiverService
-module.exports.shiveSenderService = shiveSenderService
+module.exports.setuReceiverService = setuReceiverService
+module.exports.setueSenderService = setueSenderService
