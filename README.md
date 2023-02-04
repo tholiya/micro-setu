@@ -15,14 +15,16 @@
 	    let  connection = await  sender.connect({
 		    uri:  "<rabbitMQ-connection-uri>"
 	    });
+	    
+	    await connection.assertQueue('<service-name>', { durable: <boolean> });
     
 	    //this will send data to service
-	    connection.sendToQueue('<service-name>', '<string-content>').then(data  => {
+	    connection.sendToQueue('<service-name>', '<string-content>',{ persistent: <boolean> }).then(data  => {
 		    console.log(data);
 	    });
     
 	    //this will send data to service and wait for response from service as wait option is enable
-	    connection.sendToQueue('<service-name>', '<string-content>', { wait:  true }).then(data  => { 
+	    connection.sendToQueue('<service-name>', '<string-content>', { wait:  true, persistent: <boolean> }).then(data  => { 
 		    console.log(data);
 	    });
     })();
@@ -34,7 +36,8 @@
  - service: Here we need to pass service name, this service should be up and running.
  - content: Here we need to pass **string** content, which will receive at service side.
  - option
-    - wait: default value of wait is false, if we set this to true in this case client will wait for service's response but in service while creating connection object if wait is true.    
+    - wait: default value of wait is false, if we set this to true in this case client will wait for service's response but in service while creating connection object if wait is true.
+    - persistent: this option is optional.
 
 ## Service
 
@@ -43,6 +46,8 @@
     let receiver = new shiveReceiverService({
         uri: "<rabbitMQ-connection-uri>",
         serviceName: 'my-queue-service',
+	durable: <boolean>,
+        prefetch: <digit>,
         wait: true //if you want to wait client pass this as true else pass false
     })
     
