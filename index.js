@@ -77,7 +77,7 @@ class setuReceiverService extends EventEmitter {
     }
 }
 
-class setueSenderService {
+class setuSenderService {
 
     connect(options) {
         return new Promise(async (resolve, reject) => { 
@@ -146,4 +146,4 @@ class setueSenderService {
     }
 }
 module.exports.setuReceiverService = setuReceiverService
-module.exports.setueSenderService = setueSenderService
+module.exports.setuSenderService = setuSenderService
