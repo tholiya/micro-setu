@@ -21,6 +21,15 @@ class setuReceiverService extends EventEmitter {
             const rabbitConn = await amqplib.connect(options.uri);
             let channel = await rabbitConn.createChannel();
 
+            // Add event listeners to the channel
+            channel.on('close', (err) => {
+                this.emit('close', err);
+            });
+
+            channel.on('error', (err) => {
+                this.emit('error', err);
+            });
+
             if (options.durable !== undefined) {
                 await channel.assertQueue(`wait-${options.serviceName}`, {
                     durable: options.durable
@@ -52,6 +61,15 @@ class setuReceiverService extends EventEmitter {
         try {
             const rabbitConn = await amqplib.connect(options.uri);
             let channel = await rabbitConn.createChannel();
+
+            // Add event listeners to the channel
+            channel.on('close', (err) => {
+                this.emit('close', err);
+            });
+
+            channel.on('error', (err) => {
+                this.emit('error', err);
+            });
 
             if (options.durable !== undefined) {
                 await channel.assertQueue(options.serviceName, {

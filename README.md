@@ -55,6 +55,11 @@
     receiver.on('connect', function (data) {
       console.log(data);
     });
+
+    //when service connection close to rabbitmq
+    receiver.on('close', function (data) {
+      console.log(data);
+    });
     
     //when any error come in connection
     receiver.on('error', function (error) {
